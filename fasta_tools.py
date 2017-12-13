@@ -62,5 +62,13 @@ def skyline(seqs=None,filename=None):
 
 if __name__ == '__main__':
     fasta_file = sys.argv[1]
+    try:
+        action = sys.argv[2]
+    except IndexError:
+        print 'no action given, assuming skyline'
+        action = 'skyline'
+
     seqs = read_fasta(fasta_file)
-    skyline(seqs)
+
+    if action == 'skyline':
+        skyline(seqs)
