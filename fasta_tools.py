@@ -2,8 +2,16 @@ import sys
 import matplotlib.pyplot as plt
 import numpy as np
 
+def get_consensus(seqs):
+    consensus = ''
+    seqs = seqs.values()
+    for i in range(len(seqs[0])):
+        letters = [j[i] for j in seqs]
+        consensus+= max(set(letters), key=letters.count)
+    return consensus
 
-def read_fasta(filename,consensus=0):
+
+def read_fasta(filename,consensus=-1):
     '''
     reads in a fasta file as dictionary with sequence identifiers as keys and
     sequences as values
@@ -22,7 +30,8 @@ def read_fasta(filename,consensus=0):
                 counter+=1
             else:
                 seqs[current]+=line.strip()
-
+    if consensus == -1:
+        seqs['consensus'] = get_consensus(seqs)
     return seqs
 
 def skyline(seqs=None,filename=None):
