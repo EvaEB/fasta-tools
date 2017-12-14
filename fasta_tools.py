@@ -34,13 +34,13 @@ def read_fasta(filename,consensus=-1):
         seqs['consensus'] = get_consensus(seqs)
     return seqs
 
-def skyline(seqs=None,filename=None):
+def skyline(seqs=None,filename=None,consensus=-1):
     '''
     creates a highlighter plot (as on hiv.lanl.gov) of already aligned sequences
     '''
     colors = {'A': '#bf6c60', 'T': '#99cc33', 'G': '#2a3326', 'C': '#36b8d9', '-': '#792080'}
     if seqs is None:
-        seqs = read_fasta(filename)
+        seqs = read_fasta(filename,consensus)
     to_plot = seqs.keys()
     seq_len = len(seqs[seqs.keys()[0]])
     current = 'consensus'
@@ -48,7 +48,8 @@ def skyline(seqs=None,filename=None):
     mins=None
     while len(to_plot) > 0:
         plt.plot([0,seq_len],[pos,pos],color='grey')
-        changes = [p for p,a, b in zip(range(seq_len),seqs['consensus'], seqs[current]) if a != b]
+        plt.text(seq_len,pos,current,va='center',ha='left')
+        changes = [p for p,a,b in zip(range(seq_len),seqs['consensus'], seqs[current]) if a != b]
         to_plot.remove(current)
         for change in changes:
             plt.scatter(change,pos,color=colors[seqs[current][change]])
@@ -77,7 +78,7 @@ if __name__ == '__main__':
         print 'no action given, assuming skyline'
         action = 'skyline'
 
-    seqs = read_fasta(fasta_file)
+    seqs = read_fasta(fasta_file,consensus=0)
 
     if action == 'skyline':
         skyline(seqs)
