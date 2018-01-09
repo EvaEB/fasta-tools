@@ -1,6 +1,7 @@
 import sys
 import matplotlib.pyplot as plt
 import numpy as np
+from ete3 import Tree
 
 def get_consensus(seqs):
     consensus = ''
@@ -69,6 +70,53 @@ def skyline(seqs=None,filename=None,consensus=-1):
     plt.axis('off')
     plt.show()
 
+def njTree(seqs=None,filename=None):
+    '''creates and prints/plots a simple nj tree'''
+    if seqs is None:
+        seqs = read_fasta(filename,consensus)
+
+    seq_len = len(seqs.values()[0])
+    del seqs['consensus']
+
+    diff = np.ones((len(seqs),len(seqs)))*(seq_len+1)
+    for i in range(len(seqs)):
+        for j in range(i+1,len(seqs)):
+            diff[i,j] = sum( seqs.values()[i][k] != seqs.values()[j][k] for k in range(seq_len) )
+
+    print diff
+    newick = ''
+    names = seqs.keys()
+
+    while True:
+        min_value = np.min(diff)
+        if min_value == seq_len+1:
+            break
+        min_location = np.where(np.min(diff)==diff)
+        min_location = zip(min_location[0],min_location[1])
+
+        for i in min_location:
+            if names[i[0]]!='' and names[i[1]]!='':
+                print i
+                names[i[0]] = '{},{}'.format(names[i[0]], names[i[1]])
+                names[i[1]] = ''
+                #diff[i[0],i[1]] = seq_len+1
+                #diff[i[1],i[0]] = seq_len+1
+                print diff[i[1],:],diff[i[0],:]
+                diff[i[1]:,i[0]] = (diff[i[1]:,i[1]]+diff[i[1]:,i[0]])/2
+                diff[:,i[1]] = seq_len+1
+
+                diff[i[0],i[1]:] = (diff[i[1],i[1]:]+diff[i[0],i[1]:])/2
+                diff[i[1],:] = seq_len+1
+                print diff, names
+
+        for i in range(len(names)):
+            if ',' in names[i] and names[i][0] != '(':
+                names[i] = '({})'.format(names[i])
+
+    newick = '('+[i for i in names if i != ''][0]+');'
+
+    t = Tree(newick)
+    print t
 
 if __name__ == '__main__':
     fasta_file = sys.argv[1]
@@ -78,7 +126,9 @@ if __name__ == '__main__':
         print 'no action given, assuming skyline'
         action = 'skyline'
 
-    seqs = read_fasta(fasta_file,consensus=0)
+    seqs = read_fasta(fasta_file,consensus=-1)
 
     if action == 'skyline':
-        skyline(seqs)
+        skyline(seqs,consensus = 0)
+    if action == 'tree':
+        njTree(seqs)
