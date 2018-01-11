@@ -96,28 +96,43 @@ def njTree(seqs=None,filename=None):
 
         for i in min_location:
             if names[i[0]]!='' and names[i[1]]!='':
-                print i
                 names[i[0]] = '{},{}'.format(names[i[0]], names[i[1]])
                 names[i[1]] = ''
-                #diff[i[0],i[1]] = seq_len+1
-                #diff[i[1],i[0]] = seq_len+1
-                print diff[i[1],:],diff[i[0],:]
                 diff[i[1]:,i[0]] = (diff[i[1]:,i[1]]+diff[i[1]:,i[0]])/2
                 diff[:,i[1]] = seq_len+1
 
                 diff[i[0],i[1]:] = (diff[i[1],i[1]:]+diff[i[0],i[1]:])/2
                 diff[i[1],:] = seq_len+1
-                print diff, names
 
-        for i in range(len(names)):
-            if ',' in names[i] and names[i][0] != '(':
-                names[i] = '({})'.format(names[i])
-
+        names = [add_brackets(i) for i in names]
+        print diff
+        print names
+        raw_input()
     newick = '('+[i for i in names if i != ''][0]+');'
-
+    #print newick
     t = Tree(newick)
-    print t
+    #print t
+    t.show()
 
+def add_brackets(txt):
+    if ',' in txt:
+        if txt[0] == '(' and txt[-1] == ')':
+            counter = 0
+            for i in range(len(txt)):
+                if txt[i] == '(':
+                    counter+=1
+                elif txt[i] == ')':
+                    counter-=1
+                if counter == 0:
+                    break
+            if i+1 == len(txt):
+                return txt
+            else:
+                return '({})'.format(txt)
+        else:
+            return '({})'.format(txt)
+    else:
+        return txt
 if __name__ == '__main__':
     fasta_file = sys.argv[1]
     try:
@@ -126,7 +141,7 @@ if __name__ == '__main__':
         print 'no action given, assuming skyline'
         action = 'skyline'
 
-    seqs = read_fasta(fasta_file,consensus=-1)
+    seqs = read_fasta(fasta_file,consensus=0)
 
     if action == 'skyline':
         skyline(seqs,consensus = 0)
