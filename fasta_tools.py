@@ -35,13 +35,35 @@ def read_fasta(filename,consensus=-1):
         seqs['consensus'] = get_consensus(seqs)
     return seqs
 
-def skyline(seqs=None,filename=None,consensus=-1):
+def seqs_from_fasta_string(string,consensus=-1):
+    seqs = {}
+    counter=0
+    lines = string.split('\n')
+    for line in lines:
+        if '>' in line:
+            if counter == consensus:
+                seqs['consensus'] = ''
+                current = 'consensus'
+            else:
+                current = line.strip()[1:]
+                seqs[current] = ''
+            counter+=1
+        else:
+            seqs[current]+=line.strip()
+    if consensus == -1:
+        seqs['consensus'] = get_consensus(seqs)
+    return seqs
+
+def highlighter(seqs=None,filename=None,fasta_string=None,consensus=-1):
     '''
     creates a highlighter plot (as on hiv.lanl.gov) of already aligned sequences
     '''
     colors = {'A': '#bf6c60', 'T': '#99cc33', 'G': '#2a3326', 'C': '#36b8d9', '-': '#792080'}
     if seqs is None:
-        seqs = read_fasta(filename,consensus)
+        if fasta_string is None:
+            seqs = read_fasta(filename,consensus)
+        else:
+            seqs = seqs_from_fasta_string(fasta_string)
     to_plot = seqs.keys()
     seq_len = len(seqs[seqs.keys()[0]])
     current = 'consensus'
@@ -70,10 +92,13 @@ def skyline(seqs=None,filename=None,consensus=-1):
     plt.axis('off')
     plt.show()
 
-def njTree(seqs=None,filename=None):
+def njTree(seqs=None,filename=None,fasta_string=None):
     '''creates and prints/plots a simple nj tree'''
     if seqs is None:
-        seqs = read_fasta(filename,consensus)
+        if fasta_string is None:
+            seqs = read_fasta(filename,consensus)
+        else:
+            seqs = seqs_from_fasta_string(fasta_string)
 
     seq_len = len(seqs.values()[0])
     del seqs['consensus']
@@ -105,7 +130,6 @@ def njTree(seqs=None,filename=None):
                 diff[i[1],:] = seq_len+1
 
         names = [add_brackets(i) for i in names]
-        print diff
         print names
         raw_input()
     newick = '('+[i for i in names if i != ''][0]+');'
@@ -138,12 +162,12 @@ if __name__ == '__main__':
     try:
         action = sys.argv[2]
     except IndexError:
-        print 'no action given, assuming skyline'
-        action = 'skyline'
+        print 'no action given, assuming highlighter'
+        action = 'highlighter'
 
     seqs = read_fasta(fasta_file,consensus=0)
 
-    if action == 'skyline':
-        skyline(seqs,consensus = 0)
+    if action == 'highlighter':
+        highlighter(seqs,consensus = 0)
     if action == 'tree':
         njTree(seqs)
