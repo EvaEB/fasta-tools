@@ -108,7 +108,7 @@ def njTree(seqs=None,filename=None,fasta_string=None):
         for j in range(i+1,len(seqs)):
             diff[i,j] = sum( seqs.values()[i][k] != seqs.values()[j][k] for k in range(seq_len) )
 
-    print diff
+    #print diff
     newick = ''
     names = seqs.keys()
 
@@ -130,8 +130,8 @@ def njTree(seqs=None,filename=None,fasta_string=None):
                 diff[i[1],:] = seq_len+1
 
         names = [add_brackets(i) for i in names]
-        print names
-        raw_input()
+        # print names
+        # raw_input()
     newick = '('+[i for i in names if i != ''][0]+');'
     #print newick
     t = Tree(newick)
