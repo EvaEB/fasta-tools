@@ -19,7 +19,7 @@ def read_fasta(filename,consensus=-1):
     '''
     seqs = {}
     counter = 0
-    with open(fasta_file) as f:
+    with open(filename) as f:
         for line in f.readlines():
             if '>' in line:
                 if counter == consensus:
