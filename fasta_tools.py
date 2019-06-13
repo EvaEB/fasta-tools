@@ -303,6 +303,16 @@ def add_brackets(txt,extra=''):
     else:
         return txt
 
+def removeGaps(seqs):
+    all_seqs = np.array([[j for j in i] for i in seqs.values()])
+    gap_rows = np.sum(all_seqs != '-',0)
+    to_delete = np.where(gap_rows == 0)[0]
+    new_seqs = (np.delete(all_seqs,to_delete,1))
+    for i in range(new_seqs.shape[0]):
+        print('>'+seqs.keys()[i])
+        print(''.join(new_seqs[i]))
+
+
 if __name__ == '__main__':
     fasta_file = sys.argv[1]
     try:
@@ -323,3 +333,5 @@ if __name__ == '__main__':
         advancedTree(seqs,colored=['pop1', 'pop2'])
     if action == 'diversityIndex':
         print(diversity_index(seqs))
+    if action == 'removeGaps':
+        removeGaps(seqs)

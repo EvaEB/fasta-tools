@@ -8,3 +8,4 @@ highlighter: create a highlighter plot from an aligned (!) fasta file
 njTree: creates a neighbor joining tree of the given sequences
 
 ## todo
+* update readme
