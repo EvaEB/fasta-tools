@@ -4,7 +4,7 @@ import sys
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 import numpy as np
-from ete3 import Tree, NodeStyle, faces
+#from ete3 import Tree, NodeStyle, faces
 from tqdm import tqdm
 from copy import deepcopy
 import itertools
@@ -101,7 +101,10 @@ def read_fasta(filename,consensus=-1):
     seqs = {}
     counter = 0
     with open(filename) as f:
-        for line in f.readlines():
+        lines = f.readlines()
+        if '\r' in lines[0]:
+            lines = ''.join(lines).split('\r')
+        for line in lines:
             if '>' in line:
                 if counter == consensus:
                     seqs['consensus'] = ''
