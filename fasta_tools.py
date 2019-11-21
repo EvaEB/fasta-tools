@@ -91,6 +91,16 @@ def difference_seqs(seq1,seq2):
 
     return differs
 
+def difs_from_consensus(seqs):
+    difs = {}
+    for seq in seqs:
+        if seq != 'consensus':
+            difs_here = difference_seqs(seqs[seq],seqs['consensus'])
+            difs[seq] = []
+            for i in difs_here:
+                difs[seq].append((i,seqs[seq][i]))
+    return difs
+
 
 
 def read_fasta(filename,consensus=-1):
@@ -338,3 +348,7 @@ if __name__ == '__main__':
         print(diversity_index(seqs))
     if action == 'removeGaps':
         removeGaps(seqs)
+    if action == 'difsFromConsensus':
+        difs = difs_from_consensus(seqs)
+        for i in difs:
+            print(i,difs[i])
